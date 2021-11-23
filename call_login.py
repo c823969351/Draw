@@ -23,6 +23,8 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 
 from login import Ui_Form
 
+from PyQt5.QtCore import QThread, pyqtSignal
+
 #huatu
 
 import huatutest
@@ -34,7 +36,7 @@ class MyMainForm(QMainWindow, Ui_Form):
         super(MyMainForm, self).__init__(parent)
 
         self.setupUi(self)
-
+        self.work = WorkThread()
         #
 
         self.drew.clicked.connect(self.display)
@@ -42,17 +44,18 @@ class MyMainForm(QMainWindow, Ui_Form):
         self.exit.clicked.connect(self.close)
 
     def display(self):
-        ret = 0
+        global x, y
+
         x = self.x_line.text()
         y = self.y_line.text()
         
+        self.work.signal.connect(self.check_ret)
+        self.work.start()
+        
         self.textBrowser.setText('画图:' + x + '*' + y + '\n' +
                                 'Start Gen Test Screen Files ...'+'\n')
-        self.textBrowser.repaint()
-
-        ret = huatutest.draw(x, y)
+    def check_ret(self,ret):
         if ret == 1:
-            ret = 0
             self.textBrowser.setText('错误，请重新输入正确的分辨率')
             self.textBrowser.repaint()
         else:
@@ -61,6 +64,17 @@ class MyMainForm(QMainWindow, Ui_Form):
     def close(self):
 
         sys.exit(app.exec_())
+
+class WorkThread(QThread):
+    signal = pyqtSignal(int)
+
+    def __init__ (self):
+        super(WorkThread, self).__init__()
+
+    def run(self):
+        ret = huatutest.check_ret(x, y)
+        self.signal.emit(ret)
+    
 
 
 if __name__ == "__main__":

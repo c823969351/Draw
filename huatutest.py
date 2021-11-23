@@ -295,15 +295,21 @@ def createFlickerImage_w(x, y):
         x_h = x_h + lin_x / 2
 
     return img
+def check_ret(inp_x,inp_y):
+    try:
+        x = int(inp_y)  #1080 1024 2160
+        y = int(inp_x)  #1920 1280 3840
+
+        draw(inp_x,inp_y)
+    except ValueError:
+        return 1
 
 def draw(inp_x,inp_y):
     if not os.path.exists(saveImagePath):
         os.mkdir(saveImagePath)
-    try:
-        x = int(inp_y)  #1080 1024 2160
-        y = int(inp_x)  #1920 1280 3840
-    except ValueError:
-        return 1
+    
+    x = int(inp_y)  #1080 1024 2160
+    y = int(inp_x)  #1920 1280 3840
 
     print('Start Gen Test Screen Files ...')
     saveImageFile('red', createOneColorImage(x, y, colorRed))
@@ -328,7 +334,7 @@ def draw(inp_x,inp_y):
     saveImageFile('Flicker_w',createFlickerImage_w(x,y))
     print('Generate Success!')
 
-
+    return 0
 
 if __name__ == '__main__':
     y = int(input('请输入x :'))
