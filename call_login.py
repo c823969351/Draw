@@ -51,7 +51,7 @@ class MyMainForm(QMainWindow, Ui_Form):
         
         self.work.signal.connect(self.check_ret)
         self.work.start()
-        
+
         self.textBrowser.setText('画图:' + x + '*' + y + '\n' +
                                 'Start Gen Test Screen Files ...'+'\n')
     def check_ret(self,ret):
@@ -60,6 +60,7 @@ class MyMainForm(QMainWindow, Ui_Form):
             self.textBrowser.repaint()
         else:
             self.textBrowser.setText('Generate Success!\n'+'保存路径：D:\pattern')
+            self.work.quit()
 
     def close(self):
 
