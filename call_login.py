@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+__author__ = 'jwchen'
 
 #导入程序运行必须模块
 
