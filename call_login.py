@@ -27,14 +27,14 @@ class MyMainForm(QMainWindow, Ui_Form):
         super(MyMainForm, self).__init__(parent)
 
         self.setupUi(self)
-        self.work = WorkThread()
+        self.work = WorkThread(main_win = self)
         self.work.signal.connect(self.check_ret)
         #
-
         self.drew.clicked.connect(self.display)
         self.exit.clicked.connect(self.close)
 
     def display(self):
+        self.drew.setEnabled(False)
         global x, y
 
         x = self.x_line.text()
@@ -42,15 +42,17 @@ class MyMainForm(QMainWindow, Ui_Form):
 
         self.work.start()
 
-        self.printf('画图:' + x + '*' + y + '\n' +
+        self.printf('--------------------------------------\n'+'画图:' + x + '*' + y + '\n' +
                                 'Start Gen Test Screen Files ...'+'\n')
         self.work.exit()
 
     def check_ret(self,ret):
         if ret == 1:
             self.printf('错误，请重新输入正确的分辨率')
+            self.set_btn()
         else:
             self.printf('Generate Success!\n'+'保存路径：D:\pattern')
+            self.set_btn()
             self.work.exit()
     
     def printf(self, mes):
@@ -58,7 +60,8 @@ class MyMainForm(QMainWindow, Ui_Form):
         self.cursot = self.textBrowser.textCursor()
         self.textBrowser.moveCursor(self.cursot.End)
 
-        
+    def set_btn(self):
+        self.drew.setEnabled(True)
 
     def close(self):
 
@@ -67,9 +70,9 @@ class MyMainForm(QMainWindow, Ui_Form):
 class WorkThread(QThread):
     signal = pyqtSignal(int)
 
-    def __init__ (self):
+    def __init__ (self,*args,**kwargs):
         super(WorkThread, self).__init__()
-    
+        self.main_win = kwargs.get('main_win')
     def run(self):
         ret = huatutest.check_ret(x, y)
         self.signal.emit(ret)
