@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'connect_me.ui'
-
-#
-
-# Created by: PyQt5 UI code generator 5.11.3
-
-#
-
-# WARNING! All changes made in this file will be lost!
 
 #导入程序运行必须模块
 
@@ -23,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 
 from login import Ui_Form
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal,pyqtSlot
 
 #huatu
 
@@ -37,10 +28,10 @@ class MyMainForm(QMainWindow, Ui_Form):
 
         self.setupUi(self)
         self.work = WorkThread()
+        self.work.signal.connect(self.check_ret)
         #
 
         self.drew.clicked.connect(self.display)
-
         self.exit.clicked.connect(self.close)
 
     def display(self):
@@ -48,19 +39,26 @@ class MyMainForm(QMainWindow, Ui_Form):
 
         x = self.x_line.text()
         y = self.y_line.text()
-        
-        self.work.signal.connect(self.check_ret)
+
         self.work.start()
 
-        self.textBrowser.setText('画图:' + x + '*' + y + '\n' +
+        self.printf('画图:' + x + '*' + y + '\n' +
                                 'Start Gen Test Screen Files ...'+'\n')
+        self.work.exit()
+
     def check_ret(self,ret):
         if ret == 1:
-            self.textBrowser.setText('错误，请重新输入正确的分辨率')
-            self.textBrowser.repaint()
+            self.printf('错误，请重新输入正确的分辨率')
         else:
-            self.textBrowser.setText('Generate Success!\n'+'保存路径：D:\pattern')
-            self.work.quit()
+            self.printf('Generate Success!\n'+'保存路径：D:\pattern')
+            self.work.exit()
+    
+    def printf(self, mes):
+        self.textBrowser.append(mes)  # 在指定的区域显示提示信息
+        self.cursot = self.textBrowser.textCursor()
+        self.textBrowser.moveCursor(self.cursot.End)
+
+        
 
     def close(self):
 
@@ -71,11 +69,10 @@ class WorkThread(QThread):
 
     def __init__ (self):
         super(WorkThread, self).__init__()
-
+    
     def run(self):
         ret = huatutest.check_ret(x, y)
         self.signal.emit(ret)
-    
 
 
 if __name__ == "__main__":
